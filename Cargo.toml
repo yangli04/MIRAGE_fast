@@ -2,7 +2,10 @@
 name = "mirage_rs"
 version = "0.1.0"
 edition = "2021"
-description = "Rust reimplementation of MIRAGE (Mutation-encoded Inference of RNA Activity via Generative Effects)"
+description = "MIRAGE_fast: Rust implementation of MIRAGE (Mutation-encoded Inference of RNA Activity via Generative Effects)"
+license = "MIT"
+repository = "https://github.com/yangli04/MIRAGE_fast"
+authors = ["Yang Li <yliuchicago@uchicago.edu>"]
 
 [lib]
 name = "mirage_rs"

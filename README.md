@@ -1,27 +1,51 @@
-# mirage_rs
+# MIRAGE_fast
 
-Rust port of [MIRAGE](https://github.com/yangli04/MIRAGE) — Mutation-encoded
-Inference of RNA Activity via Generative Effects.
+[![release](https://img.shields.io/badge/release-v0.1.0-orange.svg)](https://github.com/yangli04/MIRAGE_fast)
+[![license](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/yangli04/MIRAGE_fast/blob/main/LICENSE)
 
-`mirage_rs` estimates site-level RNA mutation or conversion signal from matched
-treatment/control read-count tables. It provides the same three top-level
-analyses as the R package, with per-site numerical results that match the R
-reference to within Brent tolerance (≤ 1e-7) on the canonical PAR-CLIP
-example.
+`MIRAGE_fast` (crate `mirage_rs`) is the Rust implementation of
+[MIRAGE](https://github.com/yangli04/MIRAGE) — Mutation-encoded Inference of
+RNA Activity via Generative Effects. It ships a command-line binary `mirage`
+and a Rust library that estimate site-level RNA activity (modification
+stoichiometry, structure reactivity, or protein-binding score) from matched
+treatment/control read-count tables produced by mutation-encoded RNA assays
+such as BACS, SHAPE-MaP, and PAR-CLIP.
 
-| R function                           | Rust API / CLI |
+It provides the same three top-level analyses as the R package, with per-site
+numerical results that match the R reference to within Brent tolerance
+(≤ 1e-7) on the canonical PAR-CLIP example, and runs roughly 35–50× faster
+with a fraction of the memory.
+
+| R function (`MIRAGE`)                | Rust API / CLI (`MIRAGE_fast`) |
 |---|---|
 | `compute_prior()`                    | `mirage_rs::compute_prior` / `mirage compute-prior` |
 | `estimate_inference_with_empirical()`| `mirage_rs::estimate_inference_with_empirical` / `mirage estimate-empirical` |
 | `estimate_inference_with_prior()`    | `mirage_rs::estimate_inference_with_prior` / `mirage estimate-prior` |
 
+## Which implementation should I use?
+
+| | [MIRAGE (R package)](https://github.com/yangli04/MIRAGE) | [MIRAGE_fast (Rust)](https://github.com/yangli04/MIRAGE_fast) |
+|---|---|---|
+| Best for | interactive analysis, tutorials, plotting, integration with R/Bioconductor workflows | large tables (10⁵–10⁷ sites), pipelines (Snakemake/Nextflow), HPC batch jobs |
+| Interface | R functions returning data frames; `plot_signal_scatter()` diagnostics | `mirage` CLI reading/writing TSV; Rust library |
+| Speed / memory | reference implementation | ~35–50× faster, ~2× less memory |
+| Documentation | rendered tutorials for BACS, SHAPE-MaP, PAR-CLIP at <https://yangli04.github.io/MIRAGE/> | this README |
+| Input / output | identical seven-column count table; identical output columns | identical seven-column count table; identical output columns |
+
+Both implementations accept the same input table and produce the same
+per-site estimates, so you can prototype in R and scale up with the Rust
+binary (or the reverse) without changing anything else in your workflow. See
+the R package tutorials for how to build the count table for each assay.
+
 ---
 
 ## Build
 
-Requires Rust ≥ 1.75 (any recent stable will work; tested on 1.93).
+Clone the repository and build with Cargo. Requires Rust ≥ 1.75 (any recent stable will work; tested on 1.93).
 
 ```bash
+git clone https://github.com/yangli04/MIRAGE_fast.git
+cd MIRAGE_fast
 cargo build --release
 ```
 
@@ -196,8 +220,10 @@ Add a path dependency and call the high-level functions directly.
 
 ```toml
 [dependencies]
-mirage_rs = { path = "/data/yangli/20260509_rust_implement_methylhunter" }
+mirage_rs = { git = "https://github.com/yangli04/MIRAGE_fast.git" }
 ```
+
+or, for a local checkout, `mirage_rs = { path = "/path/to/MIRAGE_fast" }`.
 
 ### Empirical inference
 
@@ -316,6 +342,8 @@ these names.
 
 ## Validation against R MIRAGE
 
+The scripts in `validation/` require the R package
+[MIRAGE](https://github.com/yangli04/MIRAGE) to be installed.
 `validation/run_R_reference.R` runs the R reference on the bundled
 `pos.read.count.example.parclip.txt` and writes its outputs to
 `validation/R_out/`. `validation/compare.R` then re-reads the matching files
@@ -429,6 +457,13 @@ with `pos` disambiguated.
 
 ---
 
+## Citation
+
+If you use MIRAGE_fast, please cite the MIRAGE manuscript and this
+repository (<https://github.com/yangli04/MIRAGE_fast>). The R reference
+implementation lives at <https://github.com/yangli04/MIRAGE>.
+
 ## License
 
-MIT, matching the upstream R MIRAGE package.
+All source code in this repository is made available under the terms of the
+[MIT license](LICENSE), matching the R MIRAGE package.
